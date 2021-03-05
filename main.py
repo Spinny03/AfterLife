@@ -1,60 +1,60 @@
-importa  speech_recognition  come  sr
-importa  pyttsx3
-import  pywhatkit
-import  datetime
-importa  wikipedia
-importa  pyjokes
+import speech_recognition as sr
+import pyttsx3
+import pywhatkit
+import datetime
+import wikipedia
+import pyjokes
 
-ascoltatore  =  sr . Riconoscitore ()
-motore  =  pyttsx3 . init ()
-voci  =  motore . getProperty ( 'voci' )
-motore . setProperty ( 'voice' , voices [ 1 ]. id )
-
-
-def  talk ( testo ):
-    motore . dire ( testo )
-    motore . runAndWait ()
+listener = sr.Recognizer()
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
 
 
-def  take_command ():
-    prova :
-        con  sr . Microfono () come  sorgente :
-            print ( 'ascolto ...' )
-            voce  =  ascoltatore . ascolta ( fonte )
-            comando  =  ascoltatore . riconoscere_google ( voce )
-            comando  =  comando . inferiore ()
-            se  'alexa'  al  comando :
-                comando  =  comando . sostituire ( 'alexa' , '' )
-                print ( comando )
-    eccetto :
-        passaggio
-     comando di ritorno
+def talk(text):
+    engine.say(text)
+    engine.runAndWait()
 
 
-def  run_alexa ():
-    comando  =  take_command ()
-    print ( comando )
-    se  "riproduci"  al  comando :
-        canzone  =  comando . sostituire ( 'play' , '' )
-        parlare ( 'suonare'  +  canzone )
-        pywhatkit . playonyt ( canzone )
-    elif  'time'  al  comando :
-        time  =  datetime . datetime . ora (). strftime ( '% I:% M% p' )
-        talk ( "L'ora corrente è"  + l'  ora )
-    elif  'chi diavolo è'  al  comando :
-        persona  =  comando . sostituire ( 'chi diavolo è' , '' )
-        info  =  wikipedia . riepilogo ( persona , 1 )
-        stampa ( info )
-        parlare ( info )
-    elif  'date'  nel  comando :
-        parlare ( "scusa, ho mal di testa" )
-    elif  'sei single'  al  comando :
-        talk ( 'Ho una relazione con il wifi' )
-    elif  'scherzo'  al  comando :
-        talk ( pyjokes . get_joke ())
-    altro :
-        talk ( "Pronuncia di nuovo il comando." )
+def take_command():
+    try:
+        with sr.Microphone() as source:
+            print('listening...')
+            voice = listener.listen(source)
+            command = listener.recognize_google(voice)
+            command = command.lower()
+            if 'alexa' in command:
+                command = command.replace('alexa', '')
+                print(command)
+    except:
+        pass
+    return command
 
 
-mentre  True :
-    run_alexa ()
+def run_alexa():
+    command = take_command()
+    print(command)
+    if 'play' in command:
+        song = command.replace('play', '')
+        talk('playing ' + song)
+        pywhatkit.playonyt(song)
+    elif 'time' in command:
+        time = datetime.datetime.now().strftime('%I:%M %p')
+        talk('Current time is ' + time)
+    elif 'who the heck is' in command:
+        person = command.replace('who the heck is', '')
+        info = wikipedia.summary(person, 1)
+        print(info)
+        talk(info)
+    elif 'date' in command:
+        talk('sorry, I have a headache')
+    elif 'are you single' in command:
+        talk('I am in a relationship with wifi')
+    elif 'joke' in command:
+        talk(pyjokes.get_joke())
+    else:
+        talk('Please say the command again.')
+
+
+while True:
+    run_alexa()
